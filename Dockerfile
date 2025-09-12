@@ -8,6 +8,7 @@ WORKDIR /app
 
 # Copy only what's needed to build assets
 COPY package.json package-lock.json* vite.config.js ./
+COPY tailwind.config.js postcss.config.js ./
 COPY resources ./resources
 
 # Install and build (no dev scripts beyond build needed)
