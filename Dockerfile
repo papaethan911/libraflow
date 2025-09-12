@@ -1,5 +1,22 @@
 # syntax=docker/dockerfile:1
 
+############################
+# Frontend build (Vite)
+############################
+FROM node:18-alpine AS assets
+WORKDIR /app
+
+# Copy only what's needed to build assets
+COPY package.json package-lock.json* vite.config.js ./
+COPY resources ./resources
+
+# Install and build (no dev scripts beyond build needed)
+RUN npm ci --no-audit --no-fund \
+	&& npm run build
+
+############################
+# PHP + Apache runtime
+############################
 FROM php:8.2-apache
 
 # Install system dependencies and PHP extensions (PostgreSQL, GD, Sodium)
@@ -32,6 +49,9 @@ WORKDIR /var/www/html
 
 # Copy app files
 COPY . .
+
+# Copy built Vite assets from node stage
+COPY --from=assets /app/public/build ./public/build
 
 # Install PHP dependencies (no dev deps)
 RUN composer install --no-dev --prefer-dist --no-progress --no-interaction --optimize-autoloader
