@@ -15,9 +15,12 @@ php artisan config:cache || true
 # Run database migrations automatically on container start
 php artisan migrate --force || true
 
-# Optionally seed admin when SEED_ADMIN=true (one-time)
+# Optional seeders controlled by env flags
 if [ "$SEED_ADMIN" = "true" ]; then
-	php artisan db:seed --class=Database\\Seeders\\AdminUserSeeder || true
+	php artisan db:seed --class=Database\\Seeders\\AdminUserSeeder --force || true
+fi
+if [ "$SEED_REAL_BOOKS" = "true" ]; then
+	php artisan db:seed --class=Database\\Seeders\\RealBooksSeeder --force || true
 fi
 
 # Start Apache HTTPD (from php:apache base image)
