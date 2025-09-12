@@ -2,14 +2,19 @@
 
 FROM php:8.2-apache
 
-# Install system dependencies and PHP extensions (PostgreSQL)
+# Install system dependencies and PHP extensions (PostgreSQL, GD, Sodium)
 RUN apt-get update \
 	&& apt-get install -y --no-install-recommends \
 		git \
 		zip \
 		unzip \
 		libpq-dev \
-	&& docker-php-ext-install pdo pdo_pgsql \
+		libpng-dev \
+		libjpeg-dev \
+		libfreetype6-dev \
+		libsodium-dev \
+	&& docker-php-ext-configure gd --with-freetype --with-jpeg \
+	&& docker-php-ext-install pdo pdo_pgsql gd sodium \
 	&& rm -rf /var/lib/apt/lists/*
 
 # Enable Apache mod_rewrite and set document root to public/
