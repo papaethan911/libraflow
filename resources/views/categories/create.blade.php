@@ -1,0 +1,13 @@
+@extends('layouts.app')
+
+@section('content')
+<div class="container">
+    <h1 class="mb-4">Add Category</h1>
+    <form action="{{ route('categories.store') }}" method="POST">
+        @csrf
+        @include('categories._form', ['category' => null])
+        <button type="submit" class="btn btn-success">Save</button>
+        <a href="{{ route('categories.index') }}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+@endsection 
