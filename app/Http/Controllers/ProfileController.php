@@ -2,19 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\ProfileUpdateRequest;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Redirect;
-use Illuminate\View\View;
+use Illuminate\Support\Facades\Storage;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class ProfileController extends Controller
 {
     /**
      * Display the user's profile form.
      */
-    public function edit(Request $request): View
+    public function edit(Request $request)
     {
         $user = $request->user();
         $recentBorrowings = $user->borrowings()->with('book')->orderByDesc('created_at')->limit(5)->get();
@@ -33,7 +30,7 @@ class ProfileController extends Controller
     /**
      * Update the user's profile information.
      */
-    public function update(ProfileUpdateRequest $request): RedirectResponse
+    public function update(Request $request)
     {
         $user = $request->user();
         $user->fill($request->validated());
@@ -67,7 +64,7 @@ class ProfileController extends Controller
     /**
      * Delete the user's account.
      */
-    public function destroy(Request $request): RedirectResponse
+    public function destroy(Request $request)
     {
         $request->validateWithBag('userDeletion', [
             'password' => ['required', 'current_password'],
@@ -113,6 +110,16 @@ class ProfileController extends Controller
     public function qr()
     {
         $user = auth()->user();
+
+        // Ensure the user's QR exists; generate on-demand if missing
+        $qrPath = $user->qr_code ?: ('qr_codes/user_' . $user->id . '.svg');
+        if (!$user->qr_code || !Storage::disk('public')->exists($qrPath)) {
+            $qrImage = QrCode::format('svg')->size(300)->generate($user->student_id ?? (string) $user->id);
+            Storage::disk('public')->put($qrPath, $qrImage);
+            $user->qr_code = $qrPath;
+            $user->save();
+        }
+
         return view('profile.qr', compact('user'));
     }
 }

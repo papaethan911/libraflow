@@ -2,25 +2,31 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class AdminUserSeeder extends Seeder
 {
 	public function run(): void
 	{
-		$adminEmail = env('ADMIN_EMAIL', 'admin@example.com');
+		$adminEmail = trim(strtolower(env('ADMIN_EMAIL', 'admin@example.com')));
 		$adminName = env('ADMIN_NAME', 'Administrator');
 		$adminPassword = env('ADMIN_PASSWORD', 'password');
 
-		User::updateOrCreate(
-			['email' => $adminEmail],
+		DB::table('users')->upsert([
 			[
+				'email' => $adminEmail,
 				'name' => $adminName,
-				'password' => Hash::make($adminPassword),
 				'role' => 'admin',
-			]
-		);
+				'password' => Hash::make($adminPassword),
+				'updated_at' => now(),
+				'created_at' => now(),
+			],
+		],
+		['email'], // unique by email
+		[
+			'name', 'role', 'password', 'updated_at'
+		]);
 	}
 } 
