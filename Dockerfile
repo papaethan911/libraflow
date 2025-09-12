@@ -40,8 +40,12 @@ RUN composer install --no-dev --prefer-dist --no-progress --no-interaction --opt
 RUN chown -R www-data:www-data storage bootstrap/cache \
 	&& chmod -R 775 storage bootstrap/cache
 
+# Add entrypoint to run migrations/config then start Apache
+COPY docker/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
 # Expose web port
 EXPOSE 80
 
-# Start Apache
-CMD ["apache2-foreground"] 
+# Start via entrypoint (handles migrations) then Apache
+ENTRYPOINT ["/entrypoint.sh"] 
