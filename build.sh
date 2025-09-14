@@ -11,14 +11,28 @@ composer install --no-dev --optimize-autoloader
 echo "Installing Node.js dependencies..."
 npm install
 
-# Build frontend assets
+# Check if public/build directory exists, create if not
+echo "Ensuring public/build directory exists..."
+mkdir -p public/build
+
+# Build frontend assets with verbose output
 echo "Building frontend assets..."
-npm run build
+npm run build --verbose
+
+# Check what was actually created
+echo "Checking build output..."
+echo "Contents of public/build/:"
+ls -la public/build/ || echo "public/build/ directory is empty or doesn't exist"
+
+echo "Contents of public/:"
+ls -la public/ | grep -E "(build|manifest)"
 
 # Verify build output
 echo "Verifying build output..."
 if [ ! -f "public/build/manifest.json" ]; then
     echo "ERROR: manifest.json not found after build!"
+    echo "Attempting to find manifest.json in other locations..."
+    find . -name "manifest.json" -type f 2>/dev/null || echo "No manifest.json found anywhere"
     exit 1
 fi
 
