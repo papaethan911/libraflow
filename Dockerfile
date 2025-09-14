@@ -18,7 +18,9 @@ RUN apt-get update && apt-get install -y \
 
 # Install Node.js
 RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
-    && apt-get install -y nodejs
+    && apt-get install -y nodejs \
+    && node --version \
+    && npm --version
 
 # Enable Apache mod_rewrite
 RUN a2enmod rewrite
@@ -32,11 +34,12 @@ WORKDIR /var/www/html
 # Copy application files
 COPY . .
 
-# Install PHP dependencies
-RUN composer install --no-dev --optimize-autoloader
+# Copy and make build script executable
+COPY build.sh /usr/local/bin/build.sh
+RUN chmod +x /usr/local/bin/build.sh
 
-# Install Node.js dependencies and build frontend assets
-RUN npm install && npm run build
+# Run the build script
+RUN /usr/local/bin/build.sh
 
 # Set proper permissions
 RUN chown -R www-data:www-data storage bootstrap/cache \
