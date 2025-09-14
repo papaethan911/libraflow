@@ -28,7 +28,7 @@
 			</ul>
 			<ul class="navbar-nav ms-auto">
 				<li class="nav-item dropdown">
-					<a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" onclick="toggleDropdown(event)">
+					<a class="nav-link" href="#" id="userDropdown" role="button" onclick="toggleDropdown(event)">
 						{{ Auth::user()->name }} <span class="text-muted small">({{ Auth::user()->student_id }})</span>
 						<span class="dropdown-arrow">▼</span>
 					</a>

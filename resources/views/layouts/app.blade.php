@@ -76,8 +76,8 @@
                 position: absolute; 
                 top: 100%; 
                 right: 0; 
-                z-index: 1000; 
-                min-width: 160px; 
+                z-index: 9999; 
+                min-width: 180px; 
                 padding: 0.5rem 0; 
                 margin: 0.125rem 0 0; 
                 background-color: #fff; 
@@ -85,6 +85,7 @@
                 border-radius: 0.375rem; 
                 box-shadow: 0 0.5rem 1rem rgba(0,0,0,.175);
                 display: none;
+                pointer-events: auto;
             }
             .dropdown-menu.show { display: block; }
             .dropdown-item { 
@@ -128,6 +129,17 @@
             }
             .dropdown-arrow.rotated { 
                 transform: rotate(180deg); 
+            }
+            
+            /* Ensure navbar doesn't interfere with dropdown */
+            .navbar { z-index: 1000; }
+            .navbar-nav .dropdown { z-index: 10000; }
+            
+            /* Make sure dropdown items are clickable */
+            .dropdown-item {
+                position: relative;
+                z-index: 10001;
+                pointer-events: auto;
             }
         </style>
     </head>
@@ -183,6 +195,10 @@
                 if (dropdownMenu && dropdownArrow) {
                     if (dropdownMenu.style.display === 'none' || dropdownMenu.style.display === '') {
                         dropdownMenu.style.display = 'block';
+                        dropdownMenu.style.position = 'absolute';
+                        dropdownMenu.style.top = '100%';
+                        dropdownMenu.style.right = '0';
+                        dropdownMenu.style.zIndex = '9999';
                         dropdownArrow.classList.add('rotated');
                     } else {
                         dropdownMenu.style.display = 'none';
@@ -202,6 +218,14 @@
                         dropdownMenu.style.display = 'none';
                         dropdownArrow.classList.remove('rotated');
                     }
+                }
+            });
+            
+            // Ensure dropdown items are clickable
+            document.addEventListener('click', function(event) {
+                if (event.target.classList.contains('dropdown-item')) {
+                    // Allow the click to proceed normally
+                    return true;
                 }
             });
         </script>
