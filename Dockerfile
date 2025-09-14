@@ -34,8 +34,8 @@ RUN apt-get update && apt-get install -y \
     && docker-php-ext-install pdo pdo_pgsql gd sodium \
     && rm -rf /var/lib/apt/lists/*
 
-# Enable Apache mod_rewrite
-RUN a2enmod rewrite
+# Enable Apache mod_rewrite and mod_php
+RUN a2enmod rewrite php8.2
 
 # Install Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
@@ -66,7 +66,11 @@ COPY <<EOF /etc/apache2/sites-available/000-default.conf
     <Directory /var/www/html/public>
         AllowOverride All
         Require all granted
+        DirectoryIndex index.php index.html
     </Directory>
+    <FilesMatch \.php$>
+        SetHandler application/x-httpd-php
+    </FilesMatch>
     ErrorLog \/error.log
     CustomLog \/access.log combined
 </VirtualHost>
