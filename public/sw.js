@@ -1,16 +1,14 @@
-const CACHE_NAME = 'libraflow-v1';
-const urlsToCache = [
-    '/',
-    '/css/app.css',
-    '/js/app.js',
-    '/manifest.json'
-];
+const CACHE_NAME = 'libraflow-v3';
 
 self.addEventListener('install', function(event) {
     event.waitUntil(
         caches.open(CACHE_NAME)
             .then(function(cache) {
-                return cache.addAll(urlsToCache);
+                // Only cache the main page and manifest
+                return cache.addAll([
+                    '/',
+                    '/build/manifest.json'
+                ]);
             })
     );
 });
