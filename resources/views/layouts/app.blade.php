@@ -54,8 +54,15 @@
             .card { box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
             .nav-link.active, .nav-link:focus { font-weight: bold; color: #0d6efd !important; }
             
-            /* Hide any loading indicators or arrows that might appear */
-            .loading-arrow, .loading-spinner, .vite-loading, [class*="arrow"], [class*="loading"] {
+            /* Fix pagination styling */
+            .pagination { display: flex; justify-content: center; align-items: center; margin: 1rem 0; }
+            .pagination .page-link { display: inline-block; padding: 0.5rem 1rem; margin: 0 0.25rem; background-color: #fff; border: 1px solid #dee2e6; color: #0d6efd; text-decoration: none; border-radius: 0.375rem; }
+            .pagination .page-link:hover { background-color: #e9ecef; border-color: #dee2e6; color: #0a58ca; }
+            .pagination .page-item.active .page-link { background-color: #0d6efd; border-color: #0d6efd; color: #fff; }
+            .pagination .page-item.disabled .page-link { color: #6c757d; background-color: #fff; border-color: #dee2e6; cursor: not-allowed; }
+            
+            /* Hide any problematic arrows or loading indicators */
+            .loading-arrow, .loading-spinner, .vite-loading {
                 display: none !important;
             }
             
