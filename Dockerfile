@@ -21,7 +21,6 @@ RUN a2enmod rewrite
 # Set Apache document root to Laravel public directory
 ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
 RUN sed -ri -e 's!/var/www/html!!g' /etc/apache2/sites-available/000-default.conf
-RUN sed -ri -e 's!/var/www/!!g' /etc/apache2/apache2.conf
 
 # Install Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
