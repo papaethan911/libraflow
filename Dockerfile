@@ -1,4 +1,23 @@
-﻿# Use PHP 8.2 with Apache
+﻿# Multi-stage build for Laravel with frontend assets
+FROM node:18-alpine AS frontend
+
+# Set working directory for frontend build
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install dependencies
+RUN npm ci --only=production
+
+# Copy frontend source files
+COPY resources/ ./resources/
+COPY tailwind.config.js postcss.config.js vite.config.js ./
+
+# Build frontend assets
+RUN npm run build
+
+# PHP stage
 FROM php:8.2-apache
 
 # Install system dependencies
@@ -26,6 +45,9 @@ WORKDIR /var/www/html
 
 # Copy application files
 COPY . .
+
+# Copy built frontend assets from frontend stage
+COPY --from=frontend /app/public/build ./public/build
 
 # Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader
