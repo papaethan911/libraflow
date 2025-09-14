@@ -28,7 +28,7 @@
 			</ul>
 			<ul class="navbar-nav ms-auto">
 				<li class="nav-item dropdown">
-					<a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+					<a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">
 						{{ Auth::user()->name }} <span class="text-muted small">({{ Auth::user()->student_id }})</span>
 					</a>
 					<ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
@@ -39,9 +39,9 @@
                 @endif
 						<li><hr class="dropdown-divider"></li>
 						<li>
-							<form method="POST" action="{{ route('logout') }}" class="px-3">
+							<form method="POST" action="{{ route('logout') }}" class="d-inline">
                     @csrf
-								<a href="{{ route('logout') }}" class="text-decoration-none" onclick="event.preventDefault(); this.closest('form').submit();">Log Out</a>
+								<button type="submit" class="dropdown-item text-danger border-0 bg-transparent w-100 text-start">Log Out</button>
                 </form>
 						</li>
 					</ul>

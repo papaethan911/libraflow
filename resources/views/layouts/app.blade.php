@@ -69,6 +69,15 @@
             /* Ensure proper layout */
             .container { position: relative; z-index: 1; }
             main { position: relative; z-index: 1; }
+            
+            /* Fix dropdown menu accessibility */
+            .dropdown-menu { display: none; }
+            .dropdown-menu.show { display: block; }
+            .dropdown-item { display: block; width: 100%; padding: 0.5rem 1rem; clear: both; font-weight: 400; color: #212529; text-align: inherit; text-decoration: none; white-space: nowrap; background-color: transparent; border: 0; }
+            .dropdown-item:hover, .dropdown-item:focus { color: #1e2125; background-color: #e9ecef; }
+            .dropdown-item.active, .dropdown-item:active { color: #fff; background-color: #0d6efd; }
+            .dropdown-item.disabled, .dropdown-item:disabled { color: #adb5bd; pointer-events: none; background-color: transparent; }
+            .dropdown-divider { height: 0; margin: 0.5rem 0; overflow: hidden; border-top: 1px solid rgba(0,0,0,.15); }
         </style>
     </head>
     <body>
@@ -109,6 +118,39 @@
                         });
                 });
             }
+        </script>
+        
+        <!-- Dropdown Menu Fallback JavaScript -->
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // Fallback for dropdown menu if Bootstrap JS fails
+                const dropdownToggle = document.getElementById('userDropdown');
+                const dropdownMenu = dropdownToggle?.nextElementSibling;
+                
+                if (dropdownToggle && dropdownMenu) {
+                    dropdownToggle.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        
+                        // Toggle dropdown
+                        if (dropdownMenu.classList.contains('show')) {
+                            dropdownMenu.classList.remove('show');
+                            dropdownToggle.setAttribute('aria-expanded', 'false');
+                        } else {
+                            dropdownMenu.classList.add('show');
+                            dropdownToggle.setAttribute('aria-expanded', 'true');
+                        }
+                    });
+                    
+                    // Close dropdown when clicking outside
+                    document.addEventListener('click', function(e) {
+                        if (!dropdownToggle.contains(e.target) && !dropdownMenu.contains(e.target)) {
+                            dropdownMenu.classList.remove('show');
+                            dropdownToggle.setAttribute('aria-expanded', 'false');
+                        }
+                    });
+                }
+            });
         </script>
     </body>
 </html>
