@@ -1,23 +1,4 @@
-﻿# Multi-stage build for Laravel with frontend assets
-FROM node:18-alpine AS frontend
-
-# Set working directory for frontend build
-WORKDIR /app
-
-# Copy package files
-COPY package*.json ./
-
-# Install ALL dependencies (including dev dependencies needed for build)
-RUN npm ci
-
-# Copy frontend source files
-COPY resources/ ./resources/
-COPY tailwind.config.js postcss.config.js vite.config.js ./
-
-# Build frontend assets
-RUN npm run build
-
-# PHP stage
+﻿# Use PHP 8.2 with Apache
 FROM php:8.2-apache
 
 # Install system dependencies
@@ -34,8 +15,8 @@ RUN apt-get update && apt-get install -y \
     && docker-php-ext-install pdo pdo_pgsql gd sodium \
     && rm -rf /var/lib/apt/lists/*
 
-# Enable Apache mod_rewrite and mod_php
-RUN a2enmod rewrite php8.2
+# Enable Apache mod_rewrite
+RUN a2enmod rewrite
 
 # Install Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
@@ -45,9 +26,6 @@ WORKDIR /var/www/html
 
 # Copy application files
 COPY . .
-
-# Copy built frontend assets from frontend stage
-COPY --from=frontend /app/public/build ./public/build
 
 # Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader
