@@ -1,72 +1,49 @@
-# syntax=docker/dockerfile:1
-
-############################
-# Frontend build (Vite)
-############################
-FROM node:18-alpine AS assets
-WORKDIR /app
-
-# Copy only what's needed to build assets
-COPY package.json package-lock.json* vite.config.js ./
-COPY tailwind.config.js postcss.config.js ./
-COPY resources ./resources
-
-# Install and build (no dev scripts beyond build needed)
-RUN npm ci --no-audit --no-fund \
-	&& npm run build
-
-############################
-# PHP + Apache runtime
-############################
+﻿# Use PHP 8.2 with Apache
 FROM php:8.2-apache
 
-# Install system dependencies and PHP extensions (PostgreSQL, GD, Sodium)
-RUN apt-get update \
-	&& apt-get install -y --no-install-recommends \
-		git \
-		zip \
-		unzip \
-		libpq-dev \
-		libpng-dev \
-		libjpeg-dev \
-		libfreetype6-dev \
-		libsodium-dev \
-	&& docker-php-ext-configure gd --with-freetype --with-jpeg \
-	&& docker-php-ext-install pdo pdo_pgsql gd sodium \
-	&& rm -rf /var/lib/apt/lists/*
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    git \
+    zip \
+    unzip \
+    libpq-dev \
+    libpng-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
+    libsodium-dev \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install pdo pdo_pgsql gd sodium \
+    && rm -rf /var/lib/apt/lists/*
 
-# Enable Apache mod_rewrite and set document root to public/
+# Enable Apache mod_rewrite
 RUN a2enmod rewrite
+
+# Set Apache document root to Laravel public directory
 ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
-RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' \
-	/etc/apache2/sites-available/000-default.conf \
-	/etc/apache2/apache2.conf \
-	/etc/apache2/sites-available/default-ssl.conf || true
+RUN sed -ri -e 's!/var/www/html!!g' /etc/apache2/sites-available/000-default.conf
+RUN sed -ri -e 's!/var/www/!!g' /etc/apache2/apache2.conf
 
 # Install Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
+# Set working directory
 WORKDIR /var/www/html
 
-# Copy app files
+# Copy application files
 COPY . .
 
-# Copy built Vite assets from node stage
-COPY --from=assets /app/public/build ./public/build
+# Install PHP dependencies
+RUN composer install --no-dev --optimize-autoloader
 
-# Install PHP dependencies (no dev deps)
-RUN composer install --no-dev --prefer-dist --no-progress --no-interaction --optimize-autoloader
-
-# Ensure writable directories
+# Set proper permissions
 RUN chown -R www-data:www-data storage bootstrap/cache \
-	&& chmod -R 775 storage bootstrap/cache
+    && chmod -R 775 storage bootstrap/cache
 
-# Add entrypoint to run migrations/config then start Apache
-COPY docker/entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+# Create storage directories
+RUN mkdir -p storage/framework/sessions storage/framework/cache storage/framework/views
 
-# Expose web port
+# Expose port 80
 EXPOSE 80
 
-# Start via entrypoint (handles migrations) then Apache
-ENTRYPOINT ["/entrypoint.sh"] 
+# Start Apache
+CMD ["apache2-foreground"]

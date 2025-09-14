@@ -13,9 +13,9 @@ return new class extends Migration
     {
         // Only add the column if it does not already exist
         if (!Schema::hasColumn('users', 'student_id')) {
-            Schema::table('users', function (Blueprint $table) {
-                $table->string('student_id')->nullable()->unique();
-            });
+        Schema::table('users', function (Blueprint $table) {
+            $table->string('student_id')->nullable()->unique();
+        });
         }
     }
 
@@ -26,9 +26,9 @@ return new class extends Migration
     {
         // Only drop the column if it exists
         if (Schema::hasColumn('users', 'student_id')) {
-            Schema::table('users', function (Blueprint $table) {
-                $table->dropColumn('student_id');
-            });
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn('student_id');
+        });
         }
     }
 };

@@ -3,7 +3,7 @@
 		<a class="navbar-brand" href="{{ route('dashboard') }}">LibraFlow</a>
 		<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
 			<span class="navbar-toggler-icon"></span>
-		</button>
+                        </button>
 		<div class="collapse navbar-collapse" id="mainNavbar">
 			<ul class="navbar-nav me-auto mb-2 mb-lg-0">
 				<li class="nav-item">
@@ -12,19 +12,19 @@
 				<li class="nav-item">
 					<a class="nav-link {{ request()->routeIs('books.*') ? 'active' : '' }}" href="{{ route('books.index') }}">Books</a>
 				</li>
-				@if(!auth()->user()->isAdmin())
+            @if(!auth()->user()->isAdmin())
 				<li class="nav-item">
 					<a class="nav-link {{ request()->routeIs('borrowings.self_checkout') ? 'active' : '' }}" href="{{ route('borrowings.self_checkout') }}">Self-Checkout</a>
 				</li>
-				@endif
-				@if(auth()->user()->isAdmin())
+            @endif
+            @if(auth()->user()->isAdmin())
 				<li class="nav-item">
 					<a class="nav-link {{ request()->routeIs('borrowings.*') ? 'active' : '' }}" href="{{ route('borrowings.index') }}">Borrowings</a>
 				</li>
 				<li class="nav-item">
 					<a class="nav-link {{ request()->routeIs('analytics.*') ? 'active' : '' }}" href="{{ route('analytics.index') }}">Analytics</a>
 				</li>
-				@endif
+            @endif
 			</ul>
 			<ul class="navbar-nav ms-auto">
 				<li class="nav-item dropdown">
@@ -34,19 +34,19 @@
 					<ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
 						<li><a class="dropdown-item" href="{{ route('settings') }}">Settings</a></li>
 						<li><a class="dropdown-item" href="{{ route('profile.qr') }}">My QR Code</a></li>
-						@if(auth()->user()->isAdmin())
+                @if(auth()->user()->isAdmin())
 						<li><a class="dropdown-item" href="{{ route('admin.settings') }}">System Settings</a></li>
-						@endif
+                @endif
 						<li><hr class="dropdown-divider"></li>
 						<li>
 							<form method="POST" action="{{ route('logout') }}" class="px-3">
-								@csrf
+                    @csrf
 								<a href="{{ route('logout') }}" class="text-decoration-none" onclick="event.preventDefault(); this.closest('form').submit();">Log Out</a>
-							</form>
+                </form>
 						</li>
 					</ul>
 				</li>
 			</ul>
-		</div>
-	</div>
+        </div>
+    </div>
 </nav>

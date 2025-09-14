@@ -6,27 +6,27 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-	/**
-	 * Run the migrations.
-	 */
-	public function up(): void
-	{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
 		if (!Schema::hasColumn('users', 'qr_code')) {
-			Schema::table('users', function (Blueprint $table) {
-				$table->string('qr_code')->nullable()->after('student_id');
-			});
+        Schema::table('users', function (Blueprint $table) {
+            $table->string('qr_code')->nullable()->after('student_id');
+        });
 		}
-	}
+    }
 
-	/**
-	 * Reverse the migrations.
-	 */
-	public function down(): void
-	{
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
 		if (Schema::hasColumn('users', 'qr_code')) {
-			Schema::table('users', function (Blueprint $table) {
-				$table->dropColumn('qr_code');
-			});
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn('qr_code');
+        });
 		}
-	}
+    }
 };
