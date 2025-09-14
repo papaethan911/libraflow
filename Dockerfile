@@ -18,17 +18,6 @@ RUN apt-get update && apt-get install -y \
 # Enable Apache mod_rewrite
 RUN a2enmod rewrite
 
-# Create custom Apache configuration for Laravel
-RUN echo '<VirtualHost *:80>' > /etc/apache2/sites-available/000-default.conf \
-    && echo '    DocumentRoot /var/www/html/public' >> /etc/apache2/sites-available/000-default.conf \
-    && echo '    <Directory /var/www/html/public>' >> /etc/apache2/sites-available/000-default.conf \
-    && echo '        AllowOverride All' >> /etc/apache2/sites-available/000-default.conf \
-    && echo '        Require all granted' >> /etc/apache2/sites-available/000-default.conf \
-    && echo '    </Directory>' >> /etc/apache2/sites-available/000-default.conf \
-    && echo '    ErrorLog /error.log' >> /etc/apache2/sites-available/000-default.conf \
-    && echo '    CustomLog /access.log combined' >> /etc/apache2/sites-available/000-default.conf \
-    && echo '</VirtualHost>' >> /etc/apache2/sites-available/000-default.conf
-
 # Install Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
@@ -48,23 +37,39 @@ RUN chown -R www-data:www-data storage bootstrap/cache \
 # Create storage directories
 RUN mkdir -p storage/framework/sessions storage/framework/cache storage/framework/views
 
+# Create Apache configuration file
+COPY <<EOF /etc/apache2/sites-available/000-default.conf
+<VirtualHost *:80>
+    DocumentRoot /var/www/html/public
+    <Directory /var/www/html/public>
+        AllowOverride All
+        Require all granted
+    </Directory>
+    ErrorLog \/error.log
+    CustomLog \/access.log combined
+</VirtualHost>
+EOF
+
 # Create startup script
-RUN echo '#!/bin/bash' > /startup.sh \
-    && echo 'set -e' >> /startup.sh \
-    && echo 'php artisan config:cache' >> /startup.sh \
-    && echo 'php artisan migrate --force' >> /startup.sh \
-    && echo 'php artisan storage:link' >> /startup.sh \
-    && echo 'if [ "" = "true" ]; then' >> /startup.sh \
-    && echo '    php artisan db:seed --class=Database\\Seeders\\AdminUserSeeder --force' >> /startup.sh \
-    && echo 'fi' >> /startup.sh \
-    && echo 'if [ "" = "true" ]; then' >> /startup.sh \
-    && echo '    php artisan db:seed --class=Database\\Seeders\\RealBooksSeeder --force' >> /startup.sh \
-    && echo 'fi' >> /startup.sh \
-    && echo 'if [ "" = "true" ]; then' >> /startup.sh \
-    && echo '    php artisan db:seed --class=Database\\Seeders\\SystemSettingsSeeder --force' >> /startup.sh \
-    && echo 'fi' >> /startup.sh \
-    && echo 'exec apache2-foreground' >> /startup.sh \
-    && chmod +x /startup.sh
+COPY <<EOF /startup.sh
+#!/bin/bash
+set -e
+php artisan config:cache
+php artisan migrate --force
+php artisan storage:link
+if [ "\" = "true" ]; then
+    php artisan db:seed --class=Database\\Seeders\\AdminUserSeeder --force
+fi
+if [ "\" = "true" ]; then
+    php artisan db:seed --class=Database\\Seeders\\RealBooksSeeder --force
+fi
+if [ "\" = "true" ]; then
+    php artisan db:seed --class=Database\\Seeders\\SystemSettingsSeeder --force
+fi
+exec apache2-foreground
+EOF
+
+RUN chmod +x /startup.sh
 
 # Expose port 80
 EXPOSE 80
