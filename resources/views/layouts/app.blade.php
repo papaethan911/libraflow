@@ -70,14 +70,65 @@
             .container { position: relative; z-index: 1; }
             main { position: relative; z-index: 1; }
             
-            /* Fix dropdown menu accessibility */
-            .dropdown-menu { display: none; }
+            /* Custom dropdown menu styling */
+            .dropdown { position: relative; }
+            .dropdown-menu { 
+                position: absolute; 
+                top: 100%; 
+                right: 0; 
+                z-index: 1000; 
+                min-width: 160px; 
+                padding: 0.5rem 0; 
+                margin: 0.125rem 0 0; 
+                background-color: #fff; 
+                border: 1px solid rgba(0,0,0,.15); 
+                border-radius: 0.375rem; 
+                box-shadow: 0 0.5rem 1rem rgba(0,0,0,.175);
+                display: none;
+            }
             .dropdown-menu.show { display: block; }
-            .dropdown-item { display: block; width: 100%; padding: 0.5rem 1rem; clear: both; font-weight: 400; color: #212529; text-align: inherit; text-decoration: none; white-space: nowrap; background-color: transparent; border: 0; }
-            .dropdown-item:hover, .dropdown-item:focus { color: #1e2125; background-color: #e9ecef; }
-            .dropdown-item.active, .dropdown-item:active { color: #fff; background-color: #0d6efd; }
-            .dropdown-item.disabled, .dropdown-item:disabled { color: #adb5bd; pointer-events: none; background-color: transparent; }
-            .dropdown-divider { height: 0; margin: 0.5rem 0; overflow: hidden; border-top: 1px solid rgba(0,0,0,.15); }
+            .dropdown-item { 
+                display: block; 
+                width: 100%; 
+                padding: 0.5rem 1rem; 
+                clear: both; 
+                font-weight: 400; 
+                color: #212529; 
+                text-align: inherit; 
+                text-decoration: none; 
+                white-space: nowrap; 
+                background-color: transparent; 
+                border: 0; 
+                cursor: pointer;
+            }
+            .dropdown-item:hover, .dropdown-item:focus { 
+                color: #1e2125; 
+                background-color: #e9ecef; 
+                text-decoration: none;
+            }
+            .dropdown-item.active, .dropdown-item:active { 
+                color: #fff; 
+                background-color: #0d6efd; 
+            }
+            .dropdown-item.disabled, .dropdown-item:disabled { 
+                color: #adb5bd; 
+                pointer-events: none; 
+                background-color: transparent; 
+            }
+            .dropdown-divider { 
+                height: 0; 
+                margin: 0.5rem 0; 
+                overflow: hidden; 
+                border-top: 1px solid rgba(0,0,0,.15); 
+            }
+            .dropdown-arrow { 
+                font-size: 0.8em; 
+                margin-left: 0.5rem; 
+                transition: transform 0.2s ease;
+            }
+            .dropdown-arrow.rotated { 
+                transform: rotate(180deg); 
+            }
         </style>
     </head>
     <body>
@@ -120,35 +171,37 @@
             }
         </script>
         
-        <!-- Dropdown Menu Fallback JavaScript -->
+        <!-- Custom Dropdown JavaScript -->
         <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                // Fallback for dropdown menu if Bootstrap JS fails
-                const dropdownToggle = document.getElementById('userDropdown');
-                const dropdownMenu = dropdownToggle?.nextElementSibling;
+            function toggleDropdown(event) {
+                event.preventDefault();
+                event.stopPropagation();
                 
-                if (dropdownToggle && dropdownMenu) {
-                    dropdownToggle.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        
-                        // Toggle dropdown
-                        if (dropdownMenu.classList.contains('show')) {
-                            dropdownMenu.classList.remove('show');
-                            dropdownToggle.setAttribute('aria-expanded', 'false');
-                        } else {
-                            dropdownMenu.classList.add('show');
-                            dropdownToggle.setAttribute('aria-expanded', 'true');
-                        }
-                    });
-                    
-                    // Close dropdown when clicking outside
-                    document.addEventListener('click', function(e) {
-                        if (!dropdownToggle.contains(e.target) && !dropdownMenu.contains(e.target)) {
-                            dropdownMenu.classList.remove('show');
-                            dropdownToggle.setAttribute('aria-expanded', 'false');
-                        }
-                    });
+                const dropdownMenu = document.getElementById('userDropdownMenu');
+                const dropdownArrow = document.querySelector('.dropdown-arrow');
+                
+                if (dropdownMenu && dropdownArrow) {
+                    if (dropdownMenu.style.display === 'none' || dropdownMenu.style.display === '') {
+                        dropdownMenu.style.display = 'block';
+                        dropdownArrow.classList.add('rotated');
+                    } else {
+                        dropdownMenu.style.display = 'none';
+                        dropdownArrow.classList.remove('rotated');
+                    }
+                }
+            }
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(event) {
+                const dropdownMenu = document.getElementById('userDropdownMenu');
+                const dropdownToggle = document.getElementById('userDropdown');
+                const dropdownArrow = document.querySelector('.dropdown-arrow');
+                
+                if (dropdownMenu && dropdownToggle && dropdownArrow) {
+                    if (!dropdownToggle.contains(event.target) && !dropdownMenu.contains(event.target)) {
+                        dropdownMenu.style.display = 'none';
+                        dropdownArrow.classList.remove('rotated');
+                    }
                 }
             });
         </script>

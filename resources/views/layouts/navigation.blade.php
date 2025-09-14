@@ -28,10 +28,11 @@
 			</ul>
 			<ul class="navbar-nav ms-auto">
 				<li class="nav-item dropdown">
-					<a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">
+					<a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" onclick="toggleDropdown(event)">
 						{{ Auth::user()->name }} <span class="text-muted small">({{ Auth::user()->student_id }})</span>
+						<span class="dropdown-arrow">▼</span>
 					</a>
-					<ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+					<ul class="dropdown-menu dropdown-menu-end" id="userDropdownMenu" style="display: none;">
 						<li><a class="dropdown-item" href="{{ route('settings') }}">Settings</a></li>
 						<li><a class="dropdown-item" href="{{ route('profile.qr') }}">My QR Code</a></li>
                 @if(auth()->user()->isAdmin())
