@@ -48,8 +48,26 @@ RUN chown -R www-data:www-data storage bootstrap/cache \
 # Create storage directories
 RUN mkdir -p storage/framework/sessions storage/framework/cache storage/framework/views
 
+# Create startup script
+RUN echo '#!/bin/bash' > /startup.sh \
+    && echo 'set -e' >> /startup.sh \
+    && echo 'php artisan config:cache' >> /startup.sh \
+    && echo 'php artisan migrate --force' >> /startup.sh \
+    && echo 'php artisan storage:link' >> /startup.sh \
+    && echo 'if [ "" = "true" ]; then' >> /startup.sh \
+    && echo '    php artisan db:seed --class=Database\\Seeders\\AdminUserSeeder --force' >> /startup.sh \
+    && echo 'fi' >> /startup.sh \
+    && echo 'if [ "" = "true" ]; then' >> /startup.sh \
+    && echo '    php artisan db:seed --class=Database\\Seeders\\RealBooksSeeder --force' >> /startup.sh \
+    && echo 'fi' >> /startup.sh \
+    && echo 'if [ "" = "true" ]; then' >> /startup.sh \
+    && echo '    php artisan db:seed --class=Database\\Seeders\\SystemSettingsSeeder --force' >> /startup.sh \
+    && echo 'fi' >> /startup.sh \
+    && echo 'exec apache2-foreground' >> /startup.sh \
+    && chmod +x /startup.sh
+
 # Expose port 80
 EXPOSE 80
 
-# Start Apache
-CMD ["apache2-foreground"]
+# Start with our custom script
+CMD ["/startup.sh"]
